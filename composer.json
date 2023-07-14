@@ -1,0 +1,8 @@
+{
+    "require": {
+        "twig/twig": "^3.0",
+        "google/recaptcha": "^1.2",
+        "curl/curl": "^2.0",
+        "google/cloud-language": "^0.30.1"
+    }
+}
