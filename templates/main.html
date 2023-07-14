@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<script>
+    $().ready(function(){
+
+        function cosTam() {
+            var tag = $("#input").serializeArray()[0]['value'];
+            var limit = $("#limit").val();
+            $.ajax("/getarticles?tag="+tag+'!_!'+limit,   // request url z tagiem i limitem art
+                {
+                    beforeSend: function(){
+                        $("#alert").hide();
+                        $("#loading").show();
+                    }
+                }).done(function(data){
+                    $("#loading").hide();
+                    if (data == '404'){
+                        $("#alert").show();
+                        $("#input").val("");
+                    } else{
+                        window.location.href = '/tag?tag='+tag;
+                    }
+                });
+
+        }
+
+        $("#submit").click(cosTam);
+
+        $("#input").bind("keypress", {}, 
+            function(e) {
+                var code = (e.keyCode ? e.keyCode : e.which);
+                if (code == 13) { //Enter keycode                        
+                    e.preventDefault();
+                    cosTam();
+                }
+            }
+        );
+        $("#limit").bind("keypress", {}, 
+            function(e) {
+                var code = (e.keyCode ? e.keyCode : e.which);
+                if (code == 13) { //Enter keycode                        
+                    e.preventDefault();
+                    cosTam();
+                }
+            }
+        );
+
+    });
+</script>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-auto pt-2 pt-sm-0 d-flex justify-content-center">
+            <div id="alert" class="alert alert-danger" style="display: none">Nie ma takiego tagu</div>
+        </div>
+        <div class="col-auto pt-2 pt-sm-0 d-flex justify-content-center">
+            <p><input id="input" type="text" name="tag" class="form-control" placeholder="Tag" style="width: 170px; height: 40px;"></p>
+            <p><input class="ms-3" type="number" id="limit" name="limit" min="1" max="20" style="height: 40px; width: 60px;" placeholder="np. 15"></p>
+        </div>
+        <div class="col-auto pt-2 pt-sm-0 d-flex justify-content-center">
+            <button id="submit" class="btn btn-info" type="button" style="width: 120px; background-color: #2b0021; border-color: #2b0021; color: #fde6f9;">Search</button>
+        </div>
+        <div class="col-auto pt-2 pt-sm-0 d-flex justify-content-center mt-3" style="color: #2b0021;">
+            {% if num_of_searches > 0 %}
+                {% if num_of_searches == 1 %}
+                    Ostatnie wyszukanie: |
+                {% else %}
+                    Ostatnie <strong>&nbsp;{{ num_of_searches }}&nbsp;</strong> wyszukania: |
+                {% endif %}
+
+                {% for i in 0..(num_of_searches-1) %}
+                    {% if searches[i] == "" %}
+                        <strong>&nbsp;<a class="link" href="/tag?tag={{ searches[i] }}">PUSTY</a>&nbsp;</strong> | 
+                    {% else %}
+                        <strong>&nbsp;<a class="link" href="/tag?tag={{ searches[i] }}">{{ searches[i] }}</a>&nbsp;</strong> | 
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 d-flex justify-content-center mt-5">
+        <img id="loading" src="/loader.gif" style="display: none;">
+    </div>
+</div>
+
+
+{% endblock %}
